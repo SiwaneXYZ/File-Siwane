@@ -1,11 +1,11 @@
-// Login Page - Last Updated 04-03-2024 15:05
+// صفحة تسجيل الدخول - آخر تحديث 04-03-2024 15:05
 var keyCharacters = ['FGHIJKLijklmarstuv', 'NOPQRSWXYZhTUVABCDE'],
     base64Characters = ['wxyzefgnopbcd', '0123456789+/='];
 
 var joinedKeyCharacters = keyCharacters.join('M'),
     joinedBase64Characters = base64Characters.join('q');
 
-// Function to open login
+// دالة لفتح تسجيل الدخول
 function loginOpen(encodedString) {
     var initializeFunction = function () {
         var initialized = true;
@@ -75,7 +75,7 @@ function loginOpen(encodedString) {
         decodedOutput = '',
         index = 0;
 
-    // Remove invalid characters
+    // إزالة الأحرف غير المسموح بها
     for (encodedString = encodedString.replace(/[^A-Za-z0-9+/=]/g, ''); index < encodedString.length;) {
         decodedString = combinedCharacters.indexOf(encodedString.charAt(index++)) << 2 | (charIndex1 = combinedCharacters.indexOf(encodedString.charAt(index++))) >> 4;
         char2 = (15 & charIndex1) << 4 | (charIndex2 = combinedCharacters.indexOf(encodedString.charAt(index++))) >> 2;
@@ -87,8 +87,7 @@ function loginOpen(encodedString) {
 
     return decodedOutput = utf8Decode(decodedOutput);
 }
-
-// Function to decode UTF-8
+// دالة لفك تشفير UTF-8
 function utf8Decode(encodedString) {
     var decodedString = '', charCode, nextCharCode, nextNextCharCode;
     var index = 0;
@@ -112,16 +111,16 @@ function utf8Decode(encodedString) {
     return decodedString;
 }
 
-// Extract URL information
+// استخراج معلومات URL
 var myMeta = document.querySelector('meta[property="og:url"]'),
     metaContent = myMeta.getAttribute('content'),
     splitMetaContent = metaContent.split('://')[1].split('/')[0];
 
 var contentIdentifier = splitMetaContent.replace(/\./g, '_');
 
-// Validate login
+// التحقق من صحة تسجيل الدخول
 if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
-    var userPasswordKey = loginOpen('OwK3SQ4brOFejdu==');
+    var userPasswordKey = loginOpen('aNFdsNa4rIZ1rV==');
     if (localStorage.getItem('user') != null) {
         window.location.href = loginSettings.redirect;
     }
@@ -130,13 +129,13 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
         passwordInput = document.querySelector('#password'),
         notification = document.querySelector('#logNotif');
 
-    // Function to validate email
+    // دالة للتحقق من صحة البريد الإلكتروني
     function validateEmail(email) {
         var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailPattern.test(email);
     }
 
-    // Function to create initials from name
+    // دالة لإنشاء الأحرف الأولى من الاسم
     function initializeInitials(fullName) {
         var initials = '';
         var nameParts = fullName.split(' ');
@@ -146,7 +145,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
         return initials;
     }
 
-    // Function to toggle password visibility
+    // دالة لتبديل عرض كلمة المرور
     function togglePasswordVisibility() {
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
@@ -159,7 +158,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
         }
     }
 
-    // Handle user input
+    // معالجة إدخال المستخدم
     document.querySelector('#forgotPas').addEventListener('keyup', function () {
         this.value = this.value.toLowerCase().replace(/\s/g, '');
     });
@@ -172,7 +171,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
 
     var loginSession = new Date();
 
-    // Function to redirect user to target page
+    // دالة لتحويل المستخدم إلى الصفحة المستهدفة
     function loginRedirect() {
         var currentUrl = window.location.href,
             targetUrl = new URLSearchParams(window.location.search).get('target');
@@ -183,7 +182,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
         }
     }
 
-    // Login with Google
+    // تسجيل الدخول باستخدام Google
     if (document.querySelector('.loginGoogle')) {
         firebase.initializeApp(firebaseConfig);
         function loginWithGoogle() {
@@ -202,8 +201,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
         }
     }
 }
-
-// Function to handle user data
+// دالة لمعالجة بيانات المستخدم
 function handleUserData(userData) {
     fetch(firebaseConfig.databaseURL + '/data.json')
         .then(response => response.json())
@@ -251,7 +249,7 @@ function handleUserData(userData) {
         });
 }
 
-// Function to login
+// دالة لتسجيل الدخول
 const auth = firebase.auth();
 function login() {
     if (emailInput.value === '') {
@@ -331,13 +329,12 @@ function login() {
         }
     }
 }
-
-// Function to show forgot password form
+// دالة لعرض نموذج استعادة كلمة المرور
 function showForgotPassword() {
     document.querySelector('.forgotPas').classList.remove('hidden');
 }
 
-// Function to send password reset email
+// دالة لإرسال بريد إلكتروني للتحقق من كلمة المرور
 function sendEmailVerification() {
     var emailInputValue = document.querySelector('#forgotPas').value;
     if (emailInputValue !== '') {
@@ -345,7 +342,7 @@ function sendEmailVerification() {
         notif.innerHTML = loginSettings.loading;
         firebase.auth().sendPasswordResetEmail(emailInputValue)
             .then(function () {
-                document.querySelector('.wrapPop.success').classList.remove('hidden');
+                document.querySelector('.wrapPop.sukses').classList.remove('hidden');
                 document.querySelector('.notverified span').innerHTML = emailInputValue;
             })
             .catch(function (error) {
@@ -354,7 +351,7 @@ function sendEmailVerification() {
     }
 }
 
-// Function to close all popups
+// دالة لإغلاق جميع النوافذ المنبثقة
 function closeAllPopups() {
     document.querySelector('#logNotif').classList.add('hidden');
     var popupElements = document.querySelectorAll('.wrapPop');
@@ -363,12 +360,12 @@ function closeAllPopups() {
     });
 }
 
-// Check user status and reload page if necessary
+// التحقق من حالة المستخدم وإعادة تحميل الصفحة إذا لزم الأمر
 if (someCondition) {
     window.location.reload();
 }
 
-// Fetch user data and check status
+// جلب بيانات المستخدم والتحقق من الحالة
 fetch(loginOpen('Xiv0Zia6md90hRvpZwEAYH02rCJbrd1DWQWAhQc0mRk0WLjoWwEdWQkAZ2PzYd5CY20pWwEdWQkAZ2PaY2hzYB5eZ29o'))
     .then(response => response.json())
     .then(data => {
