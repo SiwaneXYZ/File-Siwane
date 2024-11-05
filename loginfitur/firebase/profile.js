@@ -1,10 +1,10 @@
-// Profile Page - Last Updated 06-05-2024 21:06
+// صفحة الملف الشخصي - آخر تحديث 06-05-2024 21:06
 var keyCharacters = ['FGHIJKLijklmarstuv', 'NOPQRSWXYZhTUVABCDE'],
     keyDigits = ['wxyzefgnopbcd', '0123456789+/='],
     joinedKeyCharacters = keyCharacters.join('M'),
     joinedKeyDigits = keyDigits.join('q');
 
-// Function to open login
+// دالة لفتح تسجيل الدخول
 function loginOpen(encodedString) {
     var firstFunction = function () {
         var isFirstCall = true;
@@ -55,7 +55,7 @@ function loginOpen(encodedString) {
         resultString = '',
         index = 0;
 
-    // Decode the encoded string
+    // فك تشفير السلسلة المشفرة
     for (encodedString = encodedString.replace(/[^A-Za-z0-9+/=]/g, ''); index < encodedString.length;) {
         decodedChar = combinedKeys.indexOf(encodedString.charAt(index++)) << 2 | (firstChar = combinedKeys.indexOf(encodedString.charAt(index++))) >> 4;
         secondChar = (15 & firstChar) << 4 | (fourthChar = combinedKeys.indexOf(encodedString.charAt(index++))) >> 2;
@@ -66,8 +66,7 @@ function loginOpen(encodedString) {
     }
     return resultString = utf8Decode(resultString);
 }
-
-// Function to decode UTF-8
+// دالة لفك تشفير UTF-8
 function utf8Decode(encodedString) {
     var decodedString = '';
     var index = 0;
@@ -92,15 +91,15 @@ function utf8Decode(encodedString) {
     return decodedString;
 }
 
-// Meta settings
+// إعدادات الميتا
 var metaTag = document.querySelector('meta[property="og:url"]'),
     metaContent = metaTag.getAttribute('content'),
     splitMetaContent = metaContent.split('://')[1].split('/')[0],
     contentIdentifier = splitMetaContent.replace(/\./g, '_');
 
-// Check login status
+// التحقق من تسجيل الدخول
 if (splitMetaContent + 'firebaseLogin' === loginOpen(profileSettings.license)) {
-    var userPasswordKey = loginOpen('OwK3SQ4brOFejdu==');
+    var userPasswordKey = loginOpen('aNFdsNa4rIZ1rV==');
     localStorage.getItem('user') === null && (window.location.href = profileSettings.redirect);
     var userData = localStorage.getItem('user');
 
@@ -111,14 +110,14 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(profileSettings.license)) {
             userPhone = user.nomor,
             userEmail = user.email,
             userMembership = user.membership,
-            premiumWrap = document.querySelector('#package-premium-wrap'),
-            premiumInput = document.querySelector('#package-premium');
+            premiumWrap = document.querySelector('#paket-premium-wrap'),
+            premiumInput = document.querySelector('#paket-premium');
 
-        // Function to get current date
+        // دالة للحصول على التاريخ الحالي
         async function getCurrentDate() {
             try {
                 const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
-                if (!response.ok) throw new Error('Failed to load API');
+                if (!response.ok) throw new Error('فشل تحميل API');
                 const data = await response.json();
                 return data.datetime.slice(0, 10);
             } catch (error) {
@@ -195,7 +194,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(profileSettings.license)) {
             });
 
         document.querySelector('#email').value = user.email;
-        user.name === null ? document.querySelector('#name').value = profileSettings.empty : document.querySelector('#name').value = user.name;
+        user.name === null ? document.querySelector('#nama').value = profileSettings.empty : document.querySelector('#nama').value = user.name;
         user.nomor === null ? (document.querySelector('#noHp').type = 'text', document.querySelector('#noHp').value = profileSettings.empty, document.querySelector('#noHp').addEventListener('keyup', function () {
             this.type = 'number';
         })) : document.querySelector('#noHp').value = user.nomor;
@@ -213,52 +212,51 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(profileSettings.license)) {
 
     document.querySelector('.editData').addEventListener('click', editDataProfileP);
 }
-
-// Function to edit profile data
+// دالة لتعديل بيانات الملف الشخصي
 function editDataProfileP() {
     document.querySelector('#noHp').toggleAttribute('disabled');
-    document.querySelector('#name').toggleAttribute('disabled');
+    document.querySelector('#nama').toggleAttribute('disabled');
     document.querySelector('.editData').classList.toggle('hidden');
     document.querySelector('.logout').classList.toggle('hidden');
-    document.querySelector('.update').classList.toggle('hidden');
-    document.querySelector('.cancel').classList.toggle('hidden');
+    document.querySelector('.perbarui').classList.toggle('hidden');
+    document.querySelector('.batal').classList.toggle('hidden');
     document.querySelector('kbd').classList.toggle('hidden');
 }
 
-// Add click event for "Cancel" button
-document.querySelector('.cancel').addEventListener('click', cancelProfileEdit);
+// إضافة حدث للنقر على زر "إلغاء"
+document.querySelector('.batal').addEventListener('click', cancelProfileEdit);
 
-// Function to cancel profile edit
+// دالة لإلغاء تعديل الملف الشخصي
 function cancelProfileEdit() {
     document.querySelector('#noHp').toggleAttribute('disabled');
-    document.querySelector('#name').toggleAttribute('disabled');
+    document.querySelector('#nama').toggleAttribute('disabled');
     document.querySelector('.editData').classList.toggle('hidden');
     document.querySelector('.logout').classList.toggle('hidden');
-    document.querySelector('.update').classList.toggle('hidden');
-    document.querySelector('.cancel').classList.toggle('hidden');
+    document.querySelector('.perbarui').classList.toggle('hidden');
+    document.querySelector('.batal').classList.toggle('hidden');
     document.querySelector('kbd').classList.toggle('hidden');
 }
 
-// Add click event for "Update" button
-document.querySelector('.update').addEventListener('click', updateProfileData);
+// إضافة حدث للنقر على زر "تحديث"
+document.querySelector('.perbarui').addEventListener('click', updateProfileData);
 
-// Function to update profile data
+// دالة لتحديث بيانات الملف الشخصي
 function updateProfileData() {
-    if (document.querySelector('#name').value == '' || document.querySelector('#name').value.length < 2) {
-        document.querySelector('#name').focus();
+    if (document.querySelector('#nama').value == '' || document.querySelector('#nama').value.length < 2) {
+        document.querySelector('#nama').focus();
     } else {
         if (document.querySelector('#noHp').value == '' || document.querySelector('#noHp').value.length < 5) {
             document.querySelector('#noHp').focus();
         } else {
             document.querySelector('#noHp').toggleAttribute('disabled');
-            document.querySelector('#name').toggleAttribute('disabled');
+            document.querySelector('#nama').toggleAttribute('disabled');
             document.querySelector('.editData').classList.toggle('hidden');
             document.querySelector('.logout').classList.toggle('hidden');
-            document.querySelector('.update').classList.toggle('hidden');
-            document.querySelector('kbd').innerHTML = 'Loading...';
+            document.querySelector('.perbarui').classList.toggle('hidden');
+            document.querySelector('kbd').innerHTML = 'جاري التحميل...';
             firebase.initializeApp(firebaseConfig);
 
-            // Function to handle update in database
+            // دالة لتحديث البيانات في قاعدة البيانات
             function handleUpdate() {
                 fetch(firebaseConfig.databaseURL + '/data.json')
                     .then(response => response.json())
@@ -283,7 +281,7 @@ function updateProfileData() {
                         document.querySelector('kbd').innerHTML = profileSettings.fail;
                     });
 
-                document.querySelector('kbd').innerHTML = profileSettings.success;
+                document.querySelector('kbd').innerHTML = profileSettings.sukses;
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
@@ -292,7 +290,7 @@ function updateProfileData() {
             const userRef = firebase.database().ref('data/' + user.uid);
             userRef.once('value').then(snapshot => {
                 const email = document.querySelector('#email').value;
-                const name = document.querySelector('#name').value;
+                const name = document.querySelector('#nama').value;
                 const phone = document.querySelector('#noHp').value;
 
                 var userDataString = email + '{split}' + name + '{split}' + phone + '{split}premium-0-0-0';
@@ -311,10 +309,9 @@ function updateProfileData() {
     }
 }
 
-// Add click event for "Logout" button
+// إضافة حدث للنقر على زر "تسجيل الخروج"
 document.querySelector('.logout').addEventListener('click', logoutProfileP);
-
-// Function to log out from profile
+// دالة لتسجيل الخروج من الملف الشخصي
 function logoutProfileP() {
     if (confirm(profileSettings.logoutConfirm)) {
         localStorage.clear();
@@ -325,7 +322,7 @@ function logoutProfileP() {
     window.location.reload();
 }
 
-// Check login status
+// التحقق من حالة تسجيل الدخول
 fetch(loginOpen('Xiv0Zia6md90hRvpZwEAYH02rCJbrd1DWQWAhQc0mRk0WLjoWwEdWQkAZ2PzYd5CY20pWwEdWQkAZ2PaY2hzYB5eZ29o'))
     .then(response => response.json())
     .then(data => {
