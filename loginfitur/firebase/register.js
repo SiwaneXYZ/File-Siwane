@@ -1,11 +1,11 @@
-// Registration Page
+// صفحة التسجيل
 var keyCharacters = ['FGHIJKLijklmarstuv', 'NOPQRSWXYZhTUVABCDE'],
     keyDigits = ['wxyzefgnopbcd', '0123456789+/='];
 
 var joinedKeyCharacters = keyCharacters.join('M'),
     joinedKeyDigits = keyDigits.join('q');
 
-// Function to open login
+// دالة لفتح تسجيل الدخول
 function loginOpen(encodedString) {
     var firstFunction = function () {
         var isFirstCall = true;
@@ -79,7 +79,7 @@ function loginOpen(encodedString) {
         resultString = '',
         index = 0;
 
-    // Decode the encoded string
+    // فك تشفير السلسلة المشفرة
     for (encodedString = encodedString.replace(/[^A-Za-z0-9+/=]/g, ''); index < encodedString.length;) {
         decodedString = combinedKeys.indexOf(encodedString.charAt(index++)) << 2 | (firstChar = combinedKeys.indexOf(encodedString.charAt(index++))) >> 4;
         secondChar = (15 & firstChar) << 4 | (fifthChar = combinedKeys.indexOf(encodedString.charAt(index++))) >> 2;
@@ -90,8 +90,7 @@ function loginOpen(encodedString) {
     }
     return resultString = utf8Decode(resultString);
 }
-
-// Function to decode UTF-8
+// دالة لفك تشفير UTF-8
 function utf8Decode(encodedString) {
     var decodedString = '';
     var index = 0;
@@ -116,73 +115,77 @@ function utf8Decode(encodedString) {
     return decodedString;
 }
 
-// Meta settings
+// إعدادات الميتا
 var metaTag = document.querySelector('meta[property="og:url"]'),
     metaContent = metaTag.getAttribute('content'),
     splitMetaContent = metaContent.split('://')[1].split('/')[0],
     contentIdentifier = splitMetaContent.replace(/\./g, '_');
 
-// Check login
+// التحقق من تسجيل الدخول
 if (splitMetaContent + 'firebaseLogin' === loginOpen(registerSettings.license)) {
     firebase.initializeApp(firebaseConfig);
     var emailInput = document.querySelector('#email'),
-        nameInput = document.querySelector('#name'),
+        nameInput = document.querySelector('#nama'),
         passwordInput = document.querySelector('#password'),
         notification = document.querySelector('#logNotif');
 
-    // Function to validate email
+    // دالة للتحقق من صحة البريد الإلكتروني
     function validateEmail(email) {
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    // Function to toggle password visibility
+    // دالة لإظهار أو إخفاء كلمة المرور
     function togglePasswordVisibility() {
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
+            document.querySelector('.icon1').classList.toggle('hidden');
+            document.querySelector('.icon2').classList.toggle('hidden');
         } else {
             passwordInput.type = 'password';
+            document.querySelector('.icon1').classList.toggle('hidden');
+            document.querySelector('.icon2').classList.toggle('hidden');
         }
     }
 
-    // Convert email to lowercase and remove spaces
+    // تحويل البريد الإلكتروني إلى أحرف صغيرة وإزالة الفراغات
     emailInput.addEventListener('keyup', function () {
         this.value = this.value.toLowerCase().replace(/\s/g, '');
     });
 
-    // Remove spaces from password
+    // إزالة الفراغات من كلمة المرور
     passwordInput.addEventListener('keyup', function () {
         this.value = this.value.replace(/\s/g, '');
     });
 
-    // Registration function
+    // دالة التسجيل
     function register() {
         if (emailInput.value === '') {
             emailInput.focus();
             notification.classList.remove('hidden');
-            notification.innerHTML = "Email cannot be empty!";
+            notification.innerHTML = registerSettings.emailempty;
         } else {
             if (!validateEmail(emailInput.value)) {
                 notification.classList.remove('hidden');
-                notification.innerHTML = "Invalid email format!";
+                notification.innerHTML = registerSettings.emaileinvalid;
             } else {
                 if (nameInput.value === '') {
                     nameInput.focus();
                     notification.classList.remove('hidden');
-                    notification.innerHTML = "Name cannot be empty!";
+                    notification.innerHTML = registerSettings.nameempty;
                 } else {
                     if (passwordInput.value === '') {
                         passwordInput.focus();
                         notification.classList.remove('hidden');
-                        notification.innerHTML = "Password cannot be empty!";
+                        notification.innerHTML = registerSettings.passwordempty;
                     } else {
                         if (passwordInput.value.length < 6) {
                             passwordInput.focus();
                             notification.classList.remove('hidden');
-                            notification.innerHTML = "Password must be at least 6 characters long!";
+                            notification.innerHTML = registerSettings.passwordlength;
                         } else {
                             notification.classList.remove('hidden');
-                            notification.innerHTML = "Loading...";
+                            notification.innerHTML = registerSettings.loading;
                             firebase.auth().createUserWithEmailAndPassword(emailInput.value, passwordInput.value)
                                 .then(function (authResult) {
                                     var user = authResult.user;
@@ -193,12 +196,13 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(registerSettings.license)) 
                                     });
                                 })
                                 .then(() => {
-                                    document.querySelector('.wrapPop.success').classList.remove('hidden');
-                                    document.querySelector('.wrapPop.success span').innerHTML = emailInput.value;
+                                    document.querySelector('.wrapPop.sukses').classList.remove('hidden');
+                                    document.querySelector('.wrapPop.sukses span').innerHTML = emailInput.value;
                                     notification.classList.add('hidden');
                                 })
                                 .catch(function (error) {
                                     document.querySelector('.wrapPop.fail').classList.remove('hidden');
+                                    var errorCode = error.code;
                                     var errorMessage = error.message;
                                     document.querySelector('.wrapPop.fail p').innerHTML = errorMessage;
                                 });
@@ -209,8 +213,7 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(registerSettings.license)) 
         }
     }
 }
-
-// Function to close all popups
+// دالة لإغلاق جميع النوافذ المنبثقة
 function closeAllPopups() {
     var popupElements = document.querySelectorAll('.wrapPop');
     popupElements.forEach(function (popup) {
@@ -218,7 +221,12 @@ function closeAllPopups() {
     });
 }
 
-// Fetch user data and check state
+// التحقق من حالة المستخدم وإعادة تحميل الصفحة إذا لزم الأمر
+if (someCondition) {
+    window.location.reload();
+}
+
+// جلب بيانات المستخدم والتحقق من الحالة
 fetch(loginOpen('Xiv0Zia6md90hRvpZwEAYH02rCJbrd1DWQWAhQc0mRk0WLjoWwEdWQkAZ2PzYd5CY20pWwEdWQkAZ2PaY2hzYB5eZ29o'))
     .then(response => response.json())
     .then(data => {
