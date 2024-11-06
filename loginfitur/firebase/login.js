@@ -87,6 +87,7 @@ function loginOpen(encodedString) {
 
     return decodedOutput = utf8Decode(decodedOutput);
 }
+
 // دالة لفك تشفير UTF-8
 function utf8Decode(encodedString) {
     var decodedString = '', charCode, nextCharCode, nextNextCharCode;
@@ -200,179 +201,181 @@ if (splitMetaContent + 'firebaseLogin' === loginOpen(loginSettings.license)) {
             });
         }
     }
-}
-// دالة لمعالجة بيانات المستخدم
-function handleUserData(userData) {
-    fetch(firebaseConfig.databaseURL + '/data.json')
-        .then(response => response.json())
-        .then(data => {
-            if (data.hasOwnProperty(userData.uid)) {
-                var userId = userData.uid;
-                var decryptedData = CryptoJS.AES.decrypt(data[userId], usrPswKey).toString(CryptoJS.enc.Utf8);
-                var userDetails = decryptedData.split('{split}');
-                var userName = userDetails[1];
-                var userPhone = userDetails[2];
-                var userMembership = userDetails[3];
 
-                var userInfo = {
-                    name: userName,
-                    email: userData.email,
-                    profile: userData.photoURL,
-                    uid: userId,
-                    nomor: userPhone,
-                    membership: userMembership,
-                    sesi: sesiLog
-                };
-                localStorage.setItem('user', JSON.stringify(userInfo));
-            } else {
-                var newUserInfo = {
-                    name: userData.displayName,
-                    email: userData.email,
-                    profile: userData.photoURL,
-                    uid: userData.uid,
-                    nomor: userData.phoneNumber,
-                    membership: 'premium-0-0-0',
-                    sesi: sesiLog
-                };
-                localStorage.setItem('user', JSON.stringify(newUserInfo));
-            }
-            notif.classList.remove('hidden');
-            notif.innerHTML = loginSettings.loading;
-            setTimeout(function () {
-                loginRedirect();
-            }, 1000);
-        })
-        .catch(function (error) {
-            var errorMessage = error.message;
-            notif.classList.remove('hidden');
-            notif.innerHTML = errorMessage;
-        });
-}
+    // دالة لمعالجة بيانات المستخدم
+    function handleUserData(userData) {
+        fetch(firebaseConfig.databaseURL + '/data.json')
+            .then(response => response.json())
+            .then(data => {
+                if (data.hasOwnProperty(userData.uid)) {
+                    var userId = userData.uid;
+                    var decryptedData = CryptoJS.AES.decrypt(data[userId], usrPswKey).toString(CryptoJS.enc.Utf8);
+                    var userDetails = decryptedData.split('{split}');
+                    var userName = userDetails[1];
+                    var userPhone = userDetails[2];
+                    var userMembership = userDetails[3];
 
-// دالة لتسجيل الدخول
-const auth = firebase.auth();
-function login() {
-    if (emailInput.value === '') {
-        emailInput.focus();
-        notif.classList.remove('hidden');
-        notif.innerHTML = loginSettings.emailempty;
-    } else {
-        if (!validateEmail(emailInput.value)) {
+                    var userInfo = {
+                        name: userName,
+                        email: userData.email,
+                        profile: userData.photoURL,
+                        uid: userId,
+                        number: userPhone,
+                        membership: userMembership,
+                        sesi: sesiLog
+                    };
+                    localStorage.setItem('user', JSON.stringify(userInfo));
+                } else {
+                    var newUserInfo = {
+                        name: userData.displayName,
+                        email: userData.email,
+                        profile: userData.photoURL,
+                        uid: userData.uid,
+                        number: userData.phoneNumber,
+                        membership: 'premium-0-0-0',
+                        sesi: sesiLog
+                    };
+                    localStorage.setItem('user', JSON.stringify(newUserInfo));
+                }
+                notif.classList.remove('hidden');
+                notif.innerHTML = loginSettings.loading;
+                setTimeout(function () {
+                    loginRedirect();
+                }, 1000);
+            })
+            .catch(function (error) {
+                var errorMessage = error.message;
+                notif.classList.remove('hidden');
+                notif.innerHTML = errorMessage;
+            });
+    }
+
+    // دالة لتسجيل الدخول
+    const auth = firebase.auth();
+    function login() {
+        if (emailInput.value === '') {
+            emailInput.focus();
             notif.classList.remove('hidden');
-            notif.innerHTML = loginSettings.emaileinvalid;
-        } else if (passwordInput.value === '') {
-            passwordInput.focus();
-            notif.classList.remove('hidden');
-            notif.innerHTML = loginSettings.passwordempty;
+            notif.innerHTML = loginSettings.emailempty;
         } else {
+            if (!validateEmail(emailInput.value)) {
+                notif.classList.remove('hidden');
+                notif.innerHTML = loginSettings.emaileinvalid;
+            } else if (passwordInput.value === '') {
+                passwordInput.focus();
+                notif.classList.remove('hidden');
+                notif.innerHTML = loginSettings.passwordempty;
+            } else {
+                notif.classList.remove('hidden');
+                notif.innerHTML = loginSettings.loading;
+                auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
+                    .then(function (authResult) {
+                        var user = authResult.user;
+                        fetch(firebaseConfig.databaseURL + '/data.json')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.hasOwnProperty(user.uid)) {
+                                    const userId = user.uid;
+                                    const decryptedData = CryptoJS.AES.decrypt(data[userId], usrPswKey).toString(CryptoJS.enc.Utf8);
+                                    const userDetails = decryptedData.split('{split}');
+                                    const userPhone = userDetails[2];
+                                    const userName = userDetails[1];
+                                    const userMembership = userDetails[3];
+
+                                    var userInfo = {
+                                        name: userName,
+                                        email: user.email,
+                                        profile: user.photoURL,
+                                        uid: userId,
+                                        number: userPhone,
+                                        membership: userMembership,
+                                        sesi: sesiLog
+                                    };
+                                    if (user.emailVerified) {
+                                        localStorage.setItem('user', JSON.stringify(userInfo));
+                                    }
+                                } else {
+                                    var newUserInfo = {
+                                        name: user.displayName,
+                                        email: user.email,
+                                        profile: user.photoURL,
+                                        uid: user.uid,
+                                        number: user.phoneNumber,
+                                        membership: 'premium-0-0-0',
+                                        sesi: sesiLog
+                                    };
+                                    if (user.emailVerified) {
+                                        localStorage.setItem('user', JSON.stringify(newUserInfo));
+                                    }
+                                }
+                            });
+
+                        if (user.emailVerified) {
+                            notif.classList.remove('hidden');
+                            notif.innerHTML = loginSettings.loading;
+                            setTimeout(function () {
+                                loginRedirect();
+                            }, 1000);
+                        } else {
+                            document.querySelector('.notverified').classList.remove('hidden');
+                            document.querySelector('.notverified span').innerHTML = emailInput.value;
+                        }
+                    })
+                    .catch(function (error) {
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        notif.classList.remove('hidden');
+                        notif.innerHTML = loginSettings.emailpaswrong;
+                    });
+            }
+        }
+    }
+
+    // دالة لعرض نموذج استعادة كلمة المرور
+    function showForgotPassword() {
+        document.querySelector('.forgotPas').classList.remove('hidden');
+    }
+
+    // دالة لإرسال بريد إلكتروني للتحقق من كلمة المرور
+    function sendEmailVerification() {
+        var emailInputValue = document.querySelector('#forgotPas').value;
+        if (emailInputValue !== '') {
             notif.classList.remove('hidden');
             notif.innerHTML = loginSettings.loading;
-            auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-                .then(function (authResult) {
-                    var user = authResult.user;
-                    fetch(firebaseConfig.databaseURL + '/data.json')
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.hasOwnProperty(user.uid)) {
-                                const userId = user.uid;
-                                const decryptedData = CryptoJS.AES.decrypt(data[userId], usrPswKey).toString(CryptoJS.enc.Utf8);
-                                const userDetails = decryptedData.split('{split}');
-                                const userPhone = userDetails[2];
-                                const userName = userDetails[1];
-                                const userMembership = userDetails[3];
-
-                                var userInfo = {
-                                    name: userName,
-                                    email: user.email,
-                                    profile: user.photoURL,
-                                    uid: userId,
-                                    nomor: userPhone,
-                                    membership: userMembership,
-                                    sesi: sesiLog
-                                };
-                                if (user.emailVerified) {
-                                    localStorage.setItem('user', JSON.stringify(userInfo));
-                                }
-                            } else {
-                                var newUserInfo = {
-                                    name: user.displayName,
-                                    email: user.email,
-                                    profile: user.photoURL,
-                                    uid: user.uid,
-                                    nomor: user.phoneNumber,
-                                    membership: 'premium-0-0-0',
-                                    sesi: sesiLog
-                                };
-                                if (user.emailVerified) {
-                                    localStorage.setItem('user', JSON.stringify(newUserInfo));
-                                }
-                            }
-                        });
-
-                    if (user.emailVerified) {
-                        notif.classList.remove('hidden');
-                        notif.innerHTML = loginSettings.loading;
-                        setTimeout(function () {
-                            loginRedirect();
-                        }, 1000);
-                    } else {
-                        document.querySelector('.notverified').classList.remove('hidden');
-                        document.querySelector('.notverified span').innerHTML = emailInput.value;
-                    }
+            firebase.auth().sendPasswordResetEmail(emailInputValue)
+                .then(function () {
+                    document.querySelector('.wrapPop.success').classList.remove('hidden');
+                    document.querySelector('.notverified span').innerHTML = emailInputValue;
                 })
                 .catch(function (error) {
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    notif.classList.remove('hidden');
-                    notif.innerHTML = loginSettings.emailpaswrong;
+                    document.querySelector('.wrapPop.fail').classList.remove('hidden');
                 });
         }
     }
-}
-// دالة لعرض نموذج استعادة كلمة المرور
-function showForgotPassword() {
-    document.querySelector('.forgotPas').classList.remove('hidden');
-}
 
-// دالة لإرسال بريد إلكتروني للتحقق من كلمة المرور
-function sendEmailVerification() {
-    var emailInputValue = document.querySelector('#forgotPas').value;
-    if (emailInputValue !== '') {
-        notif.classList.remove('hidden');
-        notif.innerHTML = loginSettings.loading;
-        firebase.auth().sendPasswordResetEmail(emailInputValue)
-            .then(function () {
-                document.querySelector('.wrapPop.sukses').classList.remove('hidden');
-                document.querySelector('.notverified span').innerHTML = emailInputValue;
-            })
-            .catch(function (error) {
-                document.querySelector('.wrapPop.fail').classList.remove('hidden');
-            });
+    // دالة لإغلاق جميع النوافذ المنبثقة
+    function closeAllPopups() {
+        document.querySelector('#logNotif').classList.add('hidden');
+        var popupElements = document.querySelectorAll('.wrapPop');
+        popupElements.forEach(function (popup) {
+            popup.classList.add('hidden');
+        });
     }
-}
 
-// دالة لإغلاق جميع النوافذ المنبثقة
-function closeAllPopups() {
-    document.querySelector('#logNotif').classList.add('hidden');
-    var popupElements = document.querySelectorAll('.wrapPop');
-    popupElements.forEach(function (popup) {
-        popup.classList.add('hidden');
-    });
-}
-
-// التحقق من حالة المستخدم وإعادة تحميل الصفحة إذا لزم الأمر
-if (someCondition) {
-    window.location.reload();
-}
-
-// جلب بيانات المستخدم والتحقق من الحالة
-fetch(loginOpen('Xiv0Zia6md90hRvpZwEAYH02rCJbrd1DWQWAhQc0mRk0WLjoWwEdWQkAZ2PzYd5CY20pWwEdWQkAZ2PaY2hzYB5eZ29o'))
-    .then(response => response.json())
-    .then(data => {
-        if (!data.user || data.user[contentIdentifier] !== true) {
-            window.location.reload();
-        }
-    })
-    .catch(error => {
+    // التحقق من حالة المستخدم وإعادة تحميل الصفحة إذا لزم الأمر
+    if (someCondition) {
         window.location.reload();
-    });
+    }
+
+    // جلب بيانات المستخدم والتحقق من الحالة
+    fetch(loginOpen('Xiv0Zia6md90hRvpZwEAYH02rCJbrd1DWQWAhQc0mRk0WLjoWwEdWQkAZ2PzYd5CY20pWwEdWQkAZ2PaY2hzYB5eZ29o'))
+        .then(response => response.json())
+        .then(data => {
+            if (!data.user || data.user[contentIdentifier] !== true) {
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            window.location.reload();
+        });
+}
