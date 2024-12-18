@@ -1,2 +1,2 @@
-# JS
-Js siwane.xyz
+# File
+File siwane.xyz
